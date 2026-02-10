@@ -1,0 +1,33 @@
+{
+  "name": "aforinnov-backend",
+  "version": "1.0.0",
+  "description": "Backend pour le test de recrutement AFORINNOV",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "prisma:migrate": "npx prisma migrate dev",
+    "prisma:generate": "npx prisma generate",
+    "prisma:studio": "npx prisma studio"
+  },
+  "keywords": [
+    "express",
+    "prisma",
+    "postgresql",
+    "docker"
+  ],
+  "author": "Candidat AFORINNOV",
+  "license": "ISC",
+  "dependencies": {
+    "@prisma/client": "^5.9.1",
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.1",
+    "bcrypt": "^5.1.1",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.3",
+    "prisma": "^5.9.1"
+  }
+}

@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  # Base de données PostgreSQL
+  postgres:
+    image: postgres:15-alpine
+    container_name: aforinnov_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: aforinnov_user
+      POSTGRES_PASSWORD: aforinnov_password
+      POSTGRES_DB: aforinnov_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - aforinnov_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aforinnov_user -d aforinnov_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend Node.js + Express
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: aforinnov_backend
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      DATABASE_URL: postgresql://aforinnov_user:aforinnov_password@postgres:5432/aforinnov_db
+      JWT_SECRET: your_super_secret_jwt_key_change_this_in_production
+      PORT: 5000
+      NODE_ENV: development
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - aforinnov_network
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+
+  # Frontend React
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: aforinnov_frontend
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      REACT_APP_API_URL: http://localhost:5000
+    depends_on:
+      - backend
+    networks:
+      - aforinnov_network
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    stdin_open: true
+    tty: true
+
+networks:
+  aforinnov_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
